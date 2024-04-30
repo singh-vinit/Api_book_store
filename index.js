@@ -16,8 +16,13 @@ mongoose
   .catch((err) => console.log(err));
 
 // middlewares
+app.use(
+  cors({
+    origin: [process.env.FRONTEND_URL],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 app.use(express.json()); // parse the json data
-app.use(cors());
 app.use("/api/v1/books", bookRoutes);
 
 //global catch
@@ -35,6 +40,6 @@ app.use(function (err, req, res, next) {
 
 app.listen(port, () => {
   console.log(
-    `server is working on port: ${port} in ${process.env.NODE_ENV} mode`
+    `server is working on port: ${port} in ${process.env.NODE_ENV}mode`
   );
 });
