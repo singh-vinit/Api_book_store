@@ -1,8 +1,7 @@
-import { isValidObjectId } from "mongoose";
 import { Book } from "../models/book.js";
 import { fieldValidator } from "../utils/fieldValidator.js";
 
-export const createNewBook = async (req, res) => {
+export const createNewBook = async (req, res, next) => {
   try {
     const requiredFields = ["title", "author", "publishYear", "description"];
     if (!fieldValidator(req.body, requiredFields)) {
@@ -21,11 +20,12 @@ export const createNewBook = async (req, res) => {
       .status(201)
       .json({ success: true, message: "Book Created Successfully" });
   } catch (error) {
-    throw new Error(error);
+    res.status(500);
+    next(error);
   }
 };
 
-export const getAllBooks = async (req, res) => {
+export const getAllBooks = async (req, res, next) => {
   try {
     const books = await Book.find().lean();
     res.status(200).json({
@@ -34,31 +34,33 @@ export const getAllBooks = async (req, res) => {
       data: books,
     });
   } catch (error) {
-    throw new Error(error);
+    res.status(500);
+    next(error);
   }
 };
 
-export const getOneBook = async (req, res) => {
+export const getOneBook = async (req, res, next) => {
   try {
     const requiredFields = ["id"];
     if (!fieldValidator(req.params, requiredFields)) {
       res.json({ success: false, message: "Id Field is required!" });
     }
     const { id } = req.params;
-    const book = await Book.findOne({ id }).lean();
+    const book = await Book.findOne({ _id: id }).lean();
     res.status(200).json({
       success: true,
       data: book,
     });
   } catch (error) {
-    throw new Error(error.message);
+    res.status(500);
+    next(error);
   }
 };
 
-export const updateBook = async (req, res) => {
+export const updateBook = async (req, res, next) => {
   try {
     const requiredFields = ["id"];
-    if (!isValidObjectId(req.params, requiredFields)) {
+    if (!fieldValidator(req.params, requiredFields)) {
       res.json({ success: false, message: "Book Id is required!" });
     }
     const { id } = req.params;
@@ -67,14 +69,15 @@ export const updateBook = async (req, res) => {
       message: "book updated successfully",
     });
   } catch (error) {
-    throw new Error(error);
+    res.status(500);
+    next(error);
   }
 };
 
-export const deleteBook = async (req, res) => {
+export const deleteBook = async (req, res, next) => {
   try {
     const requiredFields = ["id"];
-    if (!isValidObjectId(req.params, requiredFields)) {
+    if (!fieldValidator(req.params, requiredFields)) {
       res.json({ success: false, message: "Book Id is required!" });
     }
     const deleteBook = await Book.findByIdAndDelete(req.params.id);
@@ -86,6 +89,7 @@ export const deleteBook = async (req, res) => {
       res.json({ success: false, message: "book not found!" });
     }
   } catch (error) {
-    throw new Error(error);
+    res.status(500);
+    next(error);
   }
 };
