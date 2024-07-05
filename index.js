@@ -20,6 +20,10 @@ app.use(cors());
 app.use(express.json()); // parse the json data
 app.use("/api/v1/books", bookRoutes);
 
+app.get("/", (req, res) => {
+  res.json({ msg: "hi from the server!" });
+});
+
 //global catch
 app.use(function (req, res, next) {
   const error = new Error(`not fount - ${req.originalUrl}`);
@@ -34,7 +38,5 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(port, () => {
-  console.log(
-    `server is working on port: ${port} in ${process.env.NODE_ENV}mode`
-  );
+  console.log(`server is working on port: ${port}`);
 });
